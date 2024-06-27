@@ -94,6 +94,7 @@ class UrnaEletronica
     if voto == 0
       @votos_nulos_brancos += 1 # Incrementa o contador de votos nulos e brancos
       puts "Voto NULO ou BRANCO registrado para Prefeito."
+      limpar_tela
     else
       candidato_encontrado = nil
       for i in 0...@candidatos.length
@@ -108,6 +109,7 @@ class UrnaEletronica
         @eleitores[cpf] = nome # Registra o nome e o CPF do eleitor
         @votos[cpf] = voto # Registra o voto do eleitor
         puts "Voto registrado com sucesso para Prefeito!"
+        limpar_tela
       else
         @votos_nulos_brancos += 1 # Incrementa o contador de votos nulos e brancos
         puts "Número inválido! Voto NULO ou BRANCO registrado para Prefeito."
