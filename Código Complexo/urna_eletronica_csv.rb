@@ -1,12 +1,14 @@
+require 'csv'
+
 # Classe que representa um candidato
 class Candidato
   attr_reader :numero, :nome, :votos
 
   # Inicializa um candidato com número, nome e votos
-  def initialize(numero, nome)
+  def initialize(numero, nome, votos = 0)
     @numero = numero
     @nome = nome
-    @votos = 0
+    @votos = votos
   end
 
   # Adiciona um voto ao candidato
@@ -18,18 +20,9 @@ end
 # Classe que representa a urna eletrônica
 class UrnaEletronica
   def initialize
-    # Lista de candidatos para Prefeito de Recife 2020
-    @candidatos = [
-      Candidato.new(10, "Marília Arraes"),
-      Candidato.new(25, "Mendonça Filho"),
-      Candidato.new(45, "Carlos Andrade Lima"),
-      Candidato.new(50, "João Campos")
-    ]
-    # Hash para armazenar eleitores (cpf => nome)
+    @candidatos = carregar_candidatos
     @eleitores = {}
-    # Hash para armazenar votos dos eleitores (cpf => voto)
     @votos = {}
-    # Contadores para votos nulos e brancos
     @votos_nulos_brancos = 0
   end
 
@@ -57,6 +50,7 @@ class UrnaEletronica
       end
     end
     exibir_resultados # Exibe os resultados finais da votação
+    salvar_resultados_em_csv # Salva os resultados em CSV
   end
 
   private
@@ -76,15 +70,11 @@ class UrnaEletronica
     # Cálculo do primeiro dígito verificador
     soma = (0..8).map { |i| numeros[i] * (10 - i) }.reduce(:+)
     primeiro_digito = (soma * 10 % 11) % 10
-    puts soma
-    puts primeiro_digito
     return false unless primeiro_digito == numeros[9]
 
     # Cálculo do segundo dígito verificador
     soma = (0..9).map { |i| numeros[i] * (11 - i) }.reduce(:+)
-    puts soma
     segundo_digito = (soma * 10 % 11) % 10
-    puts segundo_digito
     segundo_digito == numeros[10]
   end
 
@@ -134,6 +124,36 @@ class UrnaEletronica
       puts "#{candidato.nome}: #{candidato.votos} votos" # Exibe os votos de cada candidato
     end
     puts "Votos NULOS ou BRANCOS: #{@votos_nulos_brancos}" # Exibe a quantidade de votos nulos ou brancos
+  end
+
+  # Salva os resultados da votação em um arquivo CSV
+  def salvar_resultados_em_csv
+    CSV.open("resultados_votacao.csv", "wb") do |csv|
+      csv << ["Numero", "Nome", "Votos"] # Cabeçalhos
+      @candidatos.each do |candidato|
+        csv << [candidato.numero, candidato.nome, candidato.votos]
+      end
+      csv << ["NULOS ou BRANCOS", @votos_nulos_brancos]
+    end
+    puts "Resultados salvos em 'resultados_votacao.csv'"
+  end
+
+  # Carrega os candidatos a partir de um arquivo CSV ou inicializa com valores padrão
+  def carregar_candidatos
+    candidatos = []
+    if File.exist?("candidatos.csv")
+      CSV.foreach("candidatos.csv", headers: true) do |row|
+        candidatos << Candidato.new(row["Numero"].to_i, row["Nome"], row["Votos"].to_i)
+      end
+    else
+      candidatos = [
+        Candidato.new(10, "Marília Arraes"),
+        Candidato.new(25, "Mendonça Filho"),
+        Candidato.new(45, "Carlos Andrade Lima"),
+        Candidato.new(50, "João Campos")
+      ]
+    end
+    candidatos
   end
 end
 
