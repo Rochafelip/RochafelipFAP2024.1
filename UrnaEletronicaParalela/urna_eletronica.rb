@@ -155,36 +155,37 @@ class UrnaEletronica
         candidatos_menos_votados << candidato
       end
     end
-  
-    # Abre o arquivo CSV e escreve os dados
     CSV.open(filename, "wb") do |csv|
-      # Escreve o cabeçalho
       csv << ["Candidato", "Votos"]
-  
-      # Escreve os votos de cada candidato
       @votos.each do |candidato, votos|
         csv << [candidato.to_s.tr('_', ' '), votos]
       end
-  
-      # Adiciona uma linha em branco para separar as seções
       csv << []
-  
-      # Escreve os candidatos mais votados
-      csv << ["Candidato(s) mais votado(s)", "Votos"]
-      candidatos_mais_votados.each do |candidato|
-        csv << [candidato.to_s.tr('_', ' '), max_votos]
+     
+      #Verifica se teve empate e se tiver mostra os candidatos empatados
+      if candidatos_mais_votados > 1 
+        csv << ["Resultado", "Vai ter Segundo Turno"]
+        csv << ["Candidatos que estão empatados."]
+        candidatos_menos_votados.each do |candidato|
+            csv << [candidato.to_s.tr('_', ' '), max_votos]
+        end
+    else 
+        # Escreve os candidatos mais votados
+        csv << ["Candidato(s) mais votado(s)", "Votos"]
+       candidatos_mais_votados.each do |candidato|
+      csv << [candidato.to_s.tr('_', ' '), max_votos]
       end
+
+    # Adiciona uma linha em branco para separar as seções
+     csv << []
   
-      # Adiciona uma linha em branco para separar as seções
-      csv << []
-  
-      # Escreve os candidatos menos votados
+    # Escreve os candidatos menos votados
       csv << ["Candidato(s) menos votado(s)", "Votos"]
-      candidatos_menos_votados.each do |candidato|
-        csv << [candidato.to_s.tr('_', ' '), min_votos]
+     candidatos_menos_votados.each do |candidato|
+       csv << [candidato.to_s.tr('_', ' '), min_votos]
       end
     end
-  end  
+  end
 
   #Função para validar CPF
   def validar_cpf(cpf)
