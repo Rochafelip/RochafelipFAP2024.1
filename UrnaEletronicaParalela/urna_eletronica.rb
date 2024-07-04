@@ -1,4 +1,4 @@
-#Bibliotecas
+#Bibliotecas tem que instalar essas instancias gem install ...
 require 'csv'
 require 'cpf_cnpj'
 require 'securerandom'
@@ -6,12 +6,12 @@ require 'securerandom'
 #Classe que atribui o número para o nome
 class UrnaEletronica
   CANDIDATOS = {
-    1 => :candidato_a,
-    2 => :candidato_b,
-    3 => :candidato_c,
-    4 => :candidato_d,
-    5 => :branco,
-    6 => :nulo
+    10 => :"Marília Arraes",
+    25 => :"Mendonça Filho",
+    45 => :"Carlos Andrade Lima",
+    50 => :"João Campos",
+    0 => :branco,
+    1 => :nulo
   }.freeze
 
 
@@ -163,10 +163,10 @@ class UrnaEletronica
       csv << []
      
       #Verifica se teve empate e se tiver mostra os candidatos empatados
-      if candidatos_mais_votados > 1 
+      if candidatos_mais_votados.size > 1
         csv << ["Resultado", "Vai ter Segundo Turno"]
         csv << ["Candidatos que estão empatados."]
-        candidatos_menos_votados.each do |candidato|
+        candidatos_mais_votados.each do |candidato|
             csv << [candidato.to_s.tr('_', ' '), max_votos]
         end
     else 
@@ -175,6 +175,7 @@ class UrnaEletronica
        candidatos_mais_votados.each do |candidato|
       csv << [candidato.to_s.tr('_', ' '), max_votos]
       end
+    end
 
     # Adiciona uma linha em branco para separar as seções
      csv << []
